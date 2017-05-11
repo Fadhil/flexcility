@@ -32,7 +32,7 @@ defmodule Flexcility.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [{:postgrex, ">= 0.0.0"},
-     {:ecto, "~> 2.1"},
+     # {:ecto, "~> 2.1"},
      {:bolt_sips, "~> 0.2"}]
   end
 

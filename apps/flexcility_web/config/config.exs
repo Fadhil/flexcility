@@ -7,8 +7,8 @@ use Mix.Config
 
 # General application configuration
 config :flexcility_web,
-  namespace: Flexcility.Web,
-  ecto_repos: [Flexcility.Repo]
+  namespace: Flexcility.Web#,
+  # ecto_repos: [Flexcility.Repo]
 
 # Configures the endpoint
 config :flexcility_web, Flexcility.Web.Endpoint,

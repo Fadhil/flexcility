@@ -13,7 +13,7 @@ defmodule Flexcility.Application do
     import Supervisor.Spec, warn: false
 
     Supervisor.start_link([
-      worker(Flexcility.Repo, []),
+      # worker(Flexcility.Repo, []),
     ], strategy: :one_for_one, name: Flexcility.Supervisor)
   end
 end
