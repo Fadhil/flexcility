@@ -35,9 +35,10 @@ defmodule Flexcility.Web.Mixfile do
     [{:phoenix, "~> 1.3.0-rc"},
      {:phoenix_pubsub, "~> 1.0"},
      {:phoenix_ecto, "~> 3.2"},
-     {:gettext, "~> 0.11"}, 
-     {:flexcility, in_umbrella: true}, 
-     {:cowboy, "~> 1.0"}]
+     {:gettext, "~> 0.11"},
+     {:flexcility, in_umbrella: true},
+     {:cowboy, "~> 1.0"},
+     {:distillery, "~> 1.0"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
