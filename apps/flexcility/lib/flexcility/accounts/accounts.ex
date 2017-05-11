@@ -8,6 +8,9 @@ defmodule Flexcility.Accounts do
 
   alias Flexcility.Accounts.User
 
+  alias Bolt.Sips, as: Graph
+
+
   @doc """
   Returns the list of users.
 
@@ -18,7 +21,10 @@ defmodule Flexcility.Accounts do
 
   """
   def list_users do
-    Repo.all(User)
+
+    Graph.query!(Graph.conn, "MATCH (n:User) return n")
+    |> Enum.map(fn( %{"n"=>user} ) -> user.properties end)
+
   end
 
   @doc """
@@ -35,7 +41,12 @@ defmodule Flexcility.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id) do
+    [head|tail] = Graph.query!(Graph.conn, "MATCH (n:User {id: '#{id}'}) return n")
+    |> Enum.map(fn( %{"n"=>user} ) -> user.properties end)
+    head
+  end
+  #Repo.get!(User, id)
 
   @doc """
   Creates a user.
