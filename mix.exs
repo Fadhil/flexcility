@@ -4,7 +4,7 @@ defmodule Flexcility.Umbrella.Mixfile do
   def project do
     [apps_path: "apps",
      start_permanent: Mix.env == :prod,
-     version: "0.2.0"
+     version: "0.2.5"
      deps: deps()]
   end
 
