@@ -1,4 +1,5 @@
 defmodule Flexcility.Accounts do
+  import Ecto.Changeset
   @moduledoc """
   The boundary for the Accounts system.
   """
@@ -22,9 +23,14 @@ defmodule Flexcility.Accounts do
   """
   def list_users do
 
-    Graph.query!(Graph.conn, "MATCH (n:User) return n")
-    |> Enum.map(fn( %{"n"=>user} ) -> user.properties end)
+    users = Graph.query!(Graph.conn, "MATCH (n:User) return n")
+    |> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
 
+  end
+
+  defp map_to_struct(struct_, properties) do
+    properties
+    |> Enum.reduce(struct_, fn ({key, val}, acc) -> Map.put(acc, String.to_atom(key), val) end)
   end
 
   @doc """
@@ -42,11 +48,10 @@ defmodule Flexcility.Accounts do
 
   """
   def get_user!(id) do
-    [head|tail] = Graph.query!(Graph.conn, "MATCH (n:User {id: '#{id}'}) return n")
-    |> Enum.map(fn( %{"n"=>user} ) -> user.properties end)
+    [head|tail] = Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n")
+    |> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
     head
   end
-  #Repo.get!(User, id)
 
   @doc """
   Creates a user.
@@ -61,8 +66,10 @@ defmodule Flexcility.Accounts do
 
   """
   def create_user(attrs \\ %{}) do
-    %User{}
-    # |> user_changeset(attrs)
+    # {:ok, %User{name: "Fadhil", email: "test@gmail.com", uuid: "test"}}
+
+    user = %User{}
+    |> user_changeset(attrs)
     # |> Repo.insert()
   end
 
@@ -113,7 +120,7 @@ defmodule Flexcility.Accounts do
     user_changeset(user, %{})
   end
 
-  defp user_changeset(%User{} = user, attrs) do
+  def user_changeset(%User{} = user, attrs) do
     user
     |> cast(attrs, [:name, :email, :password, :password_confirmation])
     |> validate_required([:name, :email, :password, :password_confirmation])
