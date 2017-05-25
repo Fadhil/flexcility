@@ -12,10 +12,12 @@ defmodule Flexcility.Web.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    with {:ok, user} <- Accounts.create_user(user_params) do
+    with {:ok, [%{"new_user"=> new_user}]} <- Accounts.create_user(user_params) do
+      {:ok, [%{"user"=>user}]} =
+        Accounts.get_user_by_email(%{email: new_user.properties["email"]})
       conn
       |> put_status(:created)
-      |> put_resp_header("location", user_path(conn, :show, user.uuid))
+      |> put_resp_header("location", user_path(conn, :show, user.properties["uuid"]))
       |> render("show.json", user: user)
     end
   end
