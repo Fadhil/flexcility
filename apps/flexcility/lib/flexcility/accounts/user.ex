@@ -1,4 +1,5 @@
 defmodule Flexcility.Accounts.User do
+  # defstruct [:email, :name, :password, :uuid, :id]
   use Ecto.Schema
 
   schema "accounts_users" do
@@ -10,3 +11,4 @@ defmodule Flexcility.Accounts.User do
     timestamps()
   end
 end
+
