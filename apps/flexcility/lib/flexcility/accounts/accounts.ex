@@ -11,6 +11,7 @@ defmodule Flexcility.Accounts do
 
   alias Bolt.Sips, as: Graph
 
+  alias Flexcility.Graph.Node
 
   @doc """
   Returns the list of users.
@@ -70,7 +71,7 @@ defmodule Flexcility.Accounts do
 
     user = %User{}
     |> user_changeset(attrs)
-    # |> Repo.insert()
+    |> Node.insert()
   end
 
   @doc """
