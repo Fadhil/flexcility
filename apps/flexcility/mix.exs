@@ -20,7 +20,7 @@ defmodule Flexcility.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {Flexcility.Application, []},
-     extra_applications: [:bolt_sips, :logger, :runtime_tools]]
+     extra_applications: [:phoenix_ecto, :bolt_sips, :logger, :runtime_tools]]
   end
 
   # Specifies which paths to compile per environment.
@@ -32,6 +32,7 @@ defmodule Flexcility.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [{:postgrex, ">= 0.0.0"},
+     {:phoenix_ecto, "~> 3.0"},
      # {:ecto, "~> 2.1"},
      {:bolt_sips, "~> 0.2"}]
   end
