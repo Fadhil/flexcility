@@ -25,7 +25,7 @@ defmodule Flexcility.Accounts do
   def list_users do
 
     users = Graph.query!(Graph.conn, "MATCH (n:User) return n")
-    |> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
+    |> Enum.map(fn( %{"n"=>user} ) -> user end)
 
   end
 
@@ -49,10 +49,28 @@ defmodule Flexcility.Accounts do
 
   """
   def get_user!(id) do
-    [head|tail] = Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n")
-    |> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
-    head
+    [%{"n" => user }] = Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n")
+    #|> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
+    user
   end
+
+  @doc """
+  Gets a User by email
+
+  ## Examples
+
+      iex> get_user_by_email(%{email: value})
+      {:ok, %{"user"=> user} }
+
+  """
+  def get_user_by_email(%{email: email}) do
+    query = """
+    MATCH (n:User {email: '#{email}'}) RETURN n as user
+    """
+
+    Graph.query(Graph.conn, query)
+  end
+
 
   @doc """
   Creates a user.
@@ -66,12 +84,13 @@ defmodule Flexcility.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_user(attrs \\ %{}) do
-    # {:ok, %User{name: "Fadhil", email: "test@gmail.com", uuid: "test"}}
+  def create_user(%{"email"=>email, "name"=>name, "password"=>password} = attrs \\ %{}) do
+		query = """
+			CREATE (n:User {email: '#{email}', name: '#{name}', password: '#{password}'})
+			RETURN n as new_user
+		"""
 
-    user = %User{}
-    |> user_changeset(attrs)
-    |> Node.insert()
+		Graph.query(Graph.conn, query)
   end
 
   @doc """
@@ -86,7 +105,7 @@ defmodule Flexcility.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_user(%User{} = user, attrs) do
+  def update_user(user, attrs) do
     user
     # |> user_changeset(attrs)
     # |> Repo.update()
@@ -104,7 +123,7 @@ defmodule Flexcility.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_user(%User{} = user) do
+  def delete_user(user) do
     # Repo.delete(user)
   end
 
@@ -117,11 +136,11 @@ defmodule Flexcility.Accounts do
       %Ecto.Changeset{source: %User{}}
 
   """
-  def change_user(%User{} = user) do
+  def change_user(user) do
     user_changeset(user, %{})
   end
 
-  def user_changeset(%User{} = user, attrs) do
+  def user_changeset(user, attrs) do
     user
     |> cast(attrs, [:name, :email, :password, :password_confirmation])
     |> validate_required([:name, :email, :password, :password_confirmation])
