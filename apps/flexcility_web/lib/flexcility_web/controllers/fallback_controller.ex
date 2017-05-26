@@ -17,7 +17,7 @@ defmodule Flexcility.Web.FallbackController do
     message: message ]}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> render(Flexcility.Web.ErrorView, "error.json", error: %{email: "not unique"})
+    |> render(Flexcility.Web.ErrorView, "error.json", error: "Email has been taken")
   end
 
   def call(conn, {:error, :not_found}) do
