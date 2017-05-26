@@ -21,7 +21,7 @@ defmodule Flexcility.Web.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {Flexcility.Web.Application, []},
-     extra_applications: [:logger, :runtime_tools]]
+     extra_applications: [:logger, :cors_plug, :runtime_tools]]
   end
 
   # Specifies which paths to compile per environment.
@@ -38,7 +38,8 @@ defmodule Flexcility.Web.Mixfile do
      {:gettext, "~> 0.11"},
      {:flexcility, in_umbrella: true},
      {:cowboy, "~> 1.0"},
-     {:distillery, "~> 1.0"}]
+     {:distillery, "~> 1.0"},
+     {:cors_plug, "~> 1.2"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

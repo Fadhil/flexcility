@@ -1,4 +1,5 @@
 defmodule Flexcility.Accounts do
+  import Ecto.Changeset
   @moduledoc """
   The boundary for the Accounts system.
   """
@@ -10,6 +11,7 @@ defmodule Flexcility.Accounts do
 
   alias Bolt.Sips, as: Graph
 
+  alias Flexcility.Graph.Node
 
   @doc """
   Returns the list of users.
@@ -22,9 +24,14 @@ defmodule Flexcility.Accounts do
   """
   def list_users do
 
-    Graph.query!(Graph.conn, "MATCH (n:User) return n")
-    |> Enum.map(fn( %{"n"=>user} ) -> user.properties end)
+    users = Graph.query!(Graph.conn, "MATCH (n:User) return n")
+    |> Enum.map(fn( %{"n"=>user} ) -> user end)
 
+  end
+
+  defp map_to_struct(struct_, properties) do
+    properties
+    |> Enum.reduce(struct_, fn ({key, val}, acc) -> Map.put(acc, String.to_atom(key), val) end)
   end
 
   @doc """
@@ -42,11 +49,28 @@ defmodule Flexcility.Accounts do
 
   """
   def get_user!(id) do
-    [head|tail] = Graph.query!(Graph.conn, "MATCH (n:User {id: '#{id}'}) return n")
-    |> Enum.map(fn( %{"n"=>user} ) -> user.properties end)
-    head
+    [%{"n" => user }] = Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n")
+    #|> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
+    user
   end
-  #Repo.get!(User, id)
+
+  @doc """
+  Gets a User by email
+
+  ## Examples
+
+      iex> get_user_by_email(%{email: value})
+      {:ok, %{"user"=> user} }
+
+  """
+  def get_user_by_email(%{email: email}) do
+    query = """
+    MATCH (n:User {email: '#{email}'}) RETURN n as user
+    """
+
+    Graph.query(Graph.conn, query)
+  end
+
 
   @doc """
   Creates a user.
@@ -60,10 +84,13 @@ defmodule Flexcility.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_user(attrs \\ %{}) do
-    %User{}
-    # |> user_changeset(attrs)
-    # |> Repo.insert()
+  def create_user(%{"email"=>email, "name"=>name, "password"=>password} = attrs \\ %{}) do
+		query = """
+			CREATE (n:User {email: '#{email}', name: '#{name}', password: '#{password}'})
+			RETURN n as new_user
+		"""
+
+		Graph.query(Graph.conn, query)
   end
 
   @doc """
@@ -78,7 +105,7 @@ defmodule Flexcility.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_user(%User{} = user, attrs) do
+  def update_user(user, attrs) do
     user
     # |> user_changeset(attrs)
     # |> Repo.update()
@@ -96,7 +123,7 @@ defmodule Flexcility.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_user(%User{} = user) do
+  def delete_user(user) do
     # Repo.delete(user)
   end
 
@@ -109,13 +136,30 @@ defmodule Flexcility.Accounts do
       %Ecto.Changeset{source: %User{}}
 
   """
-  def change_user(%User{} = user) do
+  def change_user(user) do
     user_changeset(user, %{})
   end
 
-  defp user_changeset(%User{} = user, attrs) do
+  def user_changeset(user, attrs) do
     user
     |> cast(attrs, [:name, :email, :password, :password_confirmation])
     |> validate_required([:name, :email, :password, :password_confirmation])
+  end
+
+  def create_session(%{"email" => email, "password" => password}) do
+    query = """
+      MATCH (n:User {email: '#{email}', password: '#{password}' })
+      OPTIONAL MATCH (n)-[:HAS_ROLE]->(r) return n, r
+     """
+    result =
+      Graph.query!(
+        Graph.conn, query
+      )
+    #|> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
+    case result do
+      [] -> {:error, "Invalid Username/Password"}
+      [%{"n"=>user, "r"=>nil}] -> {:ok, %{user: user.properties, role: %{}}}
+      [%{"n"=>user, "r"=>role}] -> {:ok, %{user: user.properties, role: role.properties}}
+    end
   end
 end

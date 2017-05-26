@@ -36,6 +36,8 @@ defmodule Flexcility.Web.Endpoint do
     key: "_flexcility_web_key",
     signing_salt: "lbeZgQ8B"
 
+  plug CORSPlug
+
   plug Flexcility.Web.Router
 
   @doc """
