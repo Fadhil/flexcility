@@ -13,6 +13,12 @@ config :flexcility_web, Flexcility.Web.Endpoint,
   check_origin: false,
   watchers: []
 
+# ## CORS Config
+config :cors_plug,
+  origin: ["http://flexcility.dev:4200", "localhost:4200"],
+  max_age: 86400,
+  methods: ["GET", "POST", "PUT"]
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed
