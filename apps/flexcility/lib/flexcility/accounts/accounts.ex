@@ -145,4 +145,20 @@ defmodule Flexcility.Accounts do
     |> cast(attrs, [:name, :email, :password, :password_confirmation])
     |> validate_required([:name, :email, :password, :password_confirmation])
   end
+
+  def create_session(%{"email" => email, "password" => password}) do
+    query = """
+      MATCH (n:User {email: '#{email}', password: '#{password}' })
+      OPTIONAL MATCH (n)-[:HAS_ROLE]->(r) return n, r
+     """
+    result =
+      Graph.query!(
+        Graph.conn, query
+      )
+    #|> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
+    case result do
+      [] -> {:error, "Invalid Username/Password"}
+      [%{"n"=>user, "r"=>role}] -> {:ok, %{user: user.properties, role: role}}
+    end
+  end
 end

@@ -20,6 +20,12 @@ defmodule Flexcility.Web.FallbackController do
     |> render(Flexcility.Web.ErrorView, "error.json", error: "Email has been taken")
   end
 
+  def call(conn, {:error, error_message}) do
+    conn
+    |> put_status(:not_found)
+    |> render(Flexcility.Web.ErrorView, "error.json", error: error_message)
+  end
+
   def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)
