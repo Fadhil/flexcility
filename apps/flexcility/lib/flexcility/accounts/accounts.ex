@@ -158,7 +158,8 @@ defmodule Flexcility.Accounts do
     #|> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
     case result do
       [] -> {:error, "Invalid Username/Password"}
-      [%{"n"=>user, "r"=>role}] -> {:ok, %{user: user.properties, role: role}}
+      [%{"n"=>user, "r"=>nil}] -> {:ok, %{user: user.properties, role: %{}}}
+      [%{"n"=>user, "r"=>role}] -> {:ok, %{user: user.properties, role: role.properties}}
     end
   end
 end
