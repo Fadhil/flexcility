@@ -10,7 +10,7 @@ defmodule Flexcility.Web.ErrorView do
   end
 
   def render("error.json", assigns) do
-    assigns.error
+    %{errors: %{detail: assigns.error}}
   end
 
   # In case no render clause matches or no
