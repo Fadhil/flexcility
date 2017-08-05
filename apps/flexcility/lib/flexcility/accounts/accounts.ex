@@ -7,7 +7,8 @@ defmodule Flexcility.Accounts do
   import Ecto.{Query, Changeset}, warn: false
   # alias Flexcility.Repo
 
-  alias Flexcility.Accounts.User
+  # alias Flexcility.Accounts.User
+  alias Flexcility.Accounts.Registration
 
   alias Bolt.Sips, as: Graph
 
@@ -17,10 +18,10 @@ defmodule Flexcility.Accounts do
   Returns the list of users.
 
   ## Examples
-
-      iex> list_users()
-      [%User{}, ...]
-
+      #
+      # iex> list_users()
+      # [%User{}, ...]
+      #
   """
   def list_users do
 
@@ -40,12 +41,12 @@ defmodule Flexcility.Accounts do
   Raises `Ecto.NoResultsError` if the User does not exist.
 
   ## Examples
-
-      iex> get_user!(123)
-      %User{}
-
-      iex> get_user!(456)
-      ** (Ecto.NoResultsError)
+      #
+      # iex> get_user!(123)
+      # %User{}
+      #
+      # iex> get_user!(456)
+      # ** (Ecto.NoResultsError)
 
   """
   def get_user!(id) do
@@ -59,8 +60,8 @@ defmodule Flexcility.Accounts do
 
   ## Examples
 
-      iex> get_user_by_email(%{email: value})
-      {:ok, %{"user"=> user} }
+      # iex> get_user_by_email(%{email: value})
+      # {:ok, %{"user"=> user} }
 
   """
   def get_user_by_email(%{email: email}) do
@@ -71,17 +72,59 @@ defmodule Flexcility.Accounts do
     Graph.query(Graph.conn, query)
   end
 
+  # @doc """
+  # Register a new user account
+  #
+  # ## Examples
+  #
+  #     iex> Flexcility.Accounts.register(%{name: "Fadhil Luqman", email: "fadhil.luqman@gmail.com", password: "password" })
+  #     {:ok, %{}}
+  #
+  #     iex> Flexcility.Accounts.register(%{name: "Fadhil Luqman", email: "fadhil.luqman@gmail.com"})
+  #     {:error, %{message: "Password is required", code: "registration_password_required"}}
+  #
+  #     iex> Flexcility.Accounts.register(%{email: "fadhil.luqman@gmail.com", password: "password"})
+  #     {:error, %{message: "Name is required", code: "registration_name_required"}}
+  # """
+  # def register(attrs \\ %{})
+  # def register(
+  #   %{email: email, name: name, password: password} = attrs
+  # ) do
+  #   {:ok, %{}}
+  # end
+  #
+  # def register(
+  #   %{email: email, name: name} = attrs
+  # ) do
+  #   {:error, %{message: "Password is required", code: "registration_password_required"}}
+  # end
+  #
+  # def register(
+  #   %{email: email, password: password} = attrs
+  # ) do
+  #   {:error, %{message: "Name is required", code: "registration_name_required"}}
+  # end
+  #
+  # def register(
+  #   %{name: name, password: password} = attrs
+  # ) do
+  #   {:error, %{message: "Email is required", code: "registration_email_required"}}
+  # end
+  #
+  # def register(attrs) do
+  #   {:error, %{message: "Something went wrong", code: "something_went_wrong"}}
+  # end
 
   @doc """
   Creates a user.
 
-  ## Examples
-
-      iex> create_user(%{field: value})
-      {:ok, %User{}}
-
-      iex> create_user(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+  # ## Examples
+  #
+  #     iex> create_user(%{field: value})
+  #     {:ok, %User{}}
+  #
+  #     iex> create_user(%{field: bad_value})
+  #     {:error, %Ecto.Changeset{}}
 
   """
   def create_user(%{"email"=>email, "name"=>name, "password"=>password} = attrs \\ %{}) do
@@ -97,12 +140,12 @@ defmodule Flexcility.Accounts do
   Updates a user.
 
   ## Examples
-
-      iex> update_user(user, %{field: new_value})
-      {:ok, %User{}}
-
-      iex> update_user(user, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
+      #
+      # iex> update_user(user, %{field: new_value})
+      # {:ok, %User{}}
+      #
+      # iex> update_user(user, %{field: bad_value})
+      # {:error, %Ecto.Changeset{}}
 
   """
   def update_user(user, attrs) do
@@ -115,12 +158,12 @@ defmodule Flexcility.Accounts do
   Deletes a User.
 
   ## Examples
-
-      iex> delete_user(user)
-      {:ok, %User{}}
-
-      iex> delete_user(user)
-      {:error, %Ecto.Changeset{}}
+      #
+      # iex> delete_user(user)
+      # {:ok, %User{}}
+      #
+      # iex> delete_user(user)
+      # {:error, %Ecto.Changeset{}}
 
   """
   def delete_user(user) do
@@ -130,10 +173,10 @@ defmodule Flexcility.Accounts do
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking user changes.
 
-  ## Examples
-
-      iex> change_user(user)
-      %Ecto.Changeset{source: %User{}}
+  # ## Examples
+  #
+  #     iex> change_user(user)
+  #     %Ecto.Changeset{source: %User{}}
 
   """
   def change_user(user) do
