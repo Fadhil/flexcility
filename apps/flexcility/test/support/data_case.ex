@@ -16,20 +16,20 @@ defmodule Flexcility.DataCase do
 
   using do
     quote do
-      alias Flexcility.Repo
-
-      import Ecto
-      import Ecto.Changeset
-      import Ecto.Query
+      # alias Flexcility.Repo
+      #
+      # import Ecto
+      # import Ecto.Changeset
+      # import Ecto.Query
       import Flexcility.DataCase
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Flexcility.Repo)
+    # :ok = Ecto.Adapters.SQL.Sandbox.checkout(Flexcility.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Flexcility.Repo, {:shared, self()})
+      # Ecto.Adapters.SQL.Sandbox.mode(Flexcility.Repo, {:shared, self()})
     end
 
     :ok

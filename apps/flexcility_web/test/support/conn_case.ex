@@ -28,9 +28,9 @@ defmodule Flexcility.Web.ConnCase do
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Flexcility.Repo)
+    # :ok = Ecto.Adapters.SQL.Sandbox.checkout(Flexcility.Repo)
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Flexcility.Repo, {:shared, self()})
+      # Ecto.Adapters.SQL.Sandbox.mode(Flexcility.Repo, {:shared, self()})
     end
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end

@@ -1,5 +1,5 @@
 use Mix.Config
 
-config :flexcility, ecto_repos: [Flexcility.Repo]
+config :flexcility, ecto_repos: []
 
 import_config "#{Mix.env}.exs"
