@@ -9,6 +9,7 @@ defmodule Flexcility.Web.SessionController do
     with {:ok, user_with_role} <- Accounts.create_session(session_params) do
       conn
       |> put_status(:created)
+      |> put_resp_header("authorization", "Bearer #{user_with_role.token}")
       |> render("show.json", session: user_with_role)
     end
   end
