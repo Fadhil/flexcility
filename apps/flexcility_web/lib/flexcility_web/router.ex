@@ -10,5 +10,6 @@ defmodule Flexcility.Web.Router do
     resources "/users", UserController
     resources "/registration", RegistrationController, only: [:create]
     resources "/sessions", SessionController, only: [:create, :delete]
+    resources "/sites", SiteController
   end
 end
