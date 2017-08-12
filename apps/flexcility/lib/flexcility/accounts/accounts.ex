@@ -199,7 +199,6 @@ defmodule Flexcility.Accounts do
         Graph.conn, query
       )
 
-
     case result do
       [] -> {:error, "Invalid Username/Password"}
       [%{"n"=>user, "r"=>nil}] ->
