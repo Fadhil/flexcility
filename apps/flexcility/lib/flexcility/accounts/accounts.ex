@@ -1,5 +1,6 @@
 defmodule Flexcility.Accounts do
   import Ecto.Changeset
+
   @moduledoc """
   The boundary for the Accounts system.
   """
@@ -202,11 +203,11 @@ defmodule Flexcility.Accounts do
     case result do
       [] -> {:error, "Invalid Username/Password"}
       [%{"n"=>user, "r"=>nil}] ->
-        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user)
+        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.properties["uuid"])
         session_data = %{user: user.properties, role: %{}, token: token}
         {:ok, session_data}
       [%{"n"=>user, "r"=>role}] ->
-        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user)
+        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.properties["uuid"])
         session_data = %{user: user.properties, role: role.properties, token: token}
         {:ok, session_data}
     end
