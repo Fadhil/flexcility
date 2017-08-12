@@ -198,11 +198,18 @@ defmodule Flexcility.Accounts do
       Graph.query!(
         Graph.conn, query
       )
-    #|> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
+
+
     case result do
       [] -> {:error, "Invalid Username/Password"}
-      [%{"n"=>user, "r"=>nil}] -> {:ok, %{user: user.properties, role: %{}}}
-      [%{"n"=>user, "r"=>role}] -> {:ok, %{user: user.properties, role: role.properties}}
+      [%{"n"=>user, "r"=>nil}] ->
+        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user)
+        session_data = %{user: user.properties, role: %{}, token: token}
+        {:ok, session_data}
+      [%{"n"=>user, "r"=>role}] ->
+        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user)
+        session_data = %{user: user.properties, role: role.properties, token: token}
+        {:ok, session_data}
     end
   end
 end
