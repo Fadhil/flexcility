@@ -14,6 +14,6 @@ defmodule Flexcility.Web.SessionView do
     %{id: session.user["uuid"],
       email: session.user["email"],
       role: session.role["name"],
-      token: "429cdd7999f08e443334817b5d2ad370"}
+      token: session.token}
   end
 end

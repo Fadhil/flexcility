@@ -1,5 +1,6 @@
 defmodule Flexcility.Accounts do
   import Ecto.Changeset
+
   @moduledoc """
   The boundary for the Accounts system.
   """
@@ -38,21 +39,22 @@ defmodule Flexcility.Accounts do
   @doc """
   Gets a single user.
 
-  Raises `Ecto.NoResultsError` if the User does not exist.
-
   ## Examples
       #
       # iex> get_user!(123)
-      # %User{}
+      # {:ok, user}
       #
       # iex> get_user!(456)
-      # ** (Ecto.NoResultsError)
+      # {:error, :user_not_found}
 
   """
   def get_user!(id) do
-    [%{"n" => user }] = Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n")
-    #|> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
-    user
+    case Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n") do
+      [] ->
+        {:error, :user_not_found}
+      [%{"n" => user }]->
+        {:ok, user}
+    end
   end
 
   @doc """
@@ -198,11 +200,17 @@ defmodule Flexcility.Accounts do
       Graph.query!(
         Graph.conn, query
       )
-    #|> Enum.map(fn( %{"n"=>user} ) -> map_to_struct(%User{}, user.properties) end)
+
     case result do
       [] -> {:error, "Invalid Username/Password"}
-      [%{"n"=>user, "r"=>nil}] -> {:ok, %{user: user.properties, role: %{}}}
-      [%{"n"=>user, "r"=>role}] -> {:ok, %{user: user.properties, role: role.properties}}
+      [%{"n"=>user, "r"=>nil}] ->
+        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.properties["uuid"])
+        session_data = %{user: user.properties, role: %{}, token: token}
+        {:ok, session_data}
+      [%{"n"=>user, "r"=>role}] ->
+        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.properties["uuid"])
+        session_data = %{user: user.properties, role: role.properties, token: token}
+        {:ok, session_data}
     end
   end
 end
