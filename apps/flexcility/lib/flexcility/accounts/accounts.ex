@@ -39,15 +39,13 @@ defmodule Flexcility.Accounts do
   @doc """
   Gets a single user.
 
-  Raises `Ecto.NoResultsError` if the User does not exist.
-
   ## Examples
       #
       # iex> get_user!(123)
-      # %User{}
+      # {:ok, user}
       #
       # iex> get_user!(456)
-      # ** (Ecto.NoResultsError)
+      # {:error, :user_not_found}
 
   """
   def get_user!(id) do
