@@ -14,7 +14,7 @@ defmodule Flexcility.Web.FallbackController do
 
   def call(conn, {:error,
    [code: "Neo.ClientError.Schema.ConstraintValidationFailed",
-    message: message ]}) do
+    message: _message ]}) do
     conn
     |> put_status(:unprocessable_entity)
     |> render(Flexcility.Web.ErrorView, "error.json", error: "Email has been taken")
