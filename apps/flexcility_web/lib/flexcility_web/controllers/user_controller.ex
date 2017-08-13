@@ -2,7 +2,6 @@ defmodule Flexcility.Web.UserController do
   use Flexcility.Web, :controller
 
   alias Flexcility.Accounts
-  alias Flexcility.Accounts.User
 
   action_fallback Flexcility.Web.FallbackController
 
