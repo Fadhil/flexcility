@@ -25,10 +25,10 @@ defmodule Flexcility.Accounts do
 
   end
 
-  defp map_to_struct(struct_, properties) do
-    properties
-    |> Enum.reduce(struct_, fn ({key, val}, acc) -> Map.put(acc, String.to_atom(key), val) end)
-  end
+  # defp map_to_struct(struct_, properties) do
+  #   properties
+  #   |> Enum.reduce(struct_, fn ({key, val}, acc) -> Map.put(acc, String.to_atom(key), val) end)
+  # end
 
   @doc """
   Gets a single user.
