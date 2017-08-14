@@ -123,7 +123,7 @@ defmodule Flexcility.Accounts do
   #     {:error, %Ecto.Changeset{}}
 
   """
-  def create_user(%{"email"=>email, "name"=>name, "password"=>password} = attrs \\ %{}) do
+  def create_user(%{"email"=>email, "name"=>name, "password"=>password} \\ %{}) do
 		query = """
 			CREATE (n:User {email: '#{email}', name: '#{name}', password: '#{password}'})
 			RETURN n as new_user
