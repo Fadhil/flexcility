@@ -6,14 +6,8 @@ defmodule Flexcility.Accounts do
   """
 
   import Ecto.{Query, Changeset}, warn: false
-  # alias Flexcility.Repo
-
-  # alias Flexcility.Accounts.User
-  alias Flexcility.Accounts.Registration
 
   alias Bolt.Sips, as: Graph
-
-  alias Flexcility.Graph.Node
 
   @doc """
   Returns the list of users.
