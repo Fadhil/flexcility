@@ -20,7 +20,7 @@ defmodule Flexcility.Accounts do
   """
   def list_users do
 
-    users = Graph.query!(Graph.conn, "MATCH (n:User) return n")
+    Graph.query!(Graph.conn, "MATCH (n:User) return n")
     |> Enum.map(fn( %{"n"=>user} ) -> user end)
 
   end
