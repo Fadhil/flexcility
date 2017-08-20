@@ -22,13 +22,13 @@ defmodule Flexcility.Web.SiteController do
   end
 
   def show(conn, %{"id" => id}) do
-    with {:ok, site} <- Admin.get_site!(id) do
+    with {:ok, site} <- Admin.get_site(id) do
       render(conn, "show.json", site: site)
     end
   end
 
   def update(conn, %{"id" => id, "site" => site_params}) do
-    site = Admin.get_site!(id)
+    site = Admin.get_site(id)
 
     with {:ok, %Site{} = site} <- Admin.update_site(site, site_params) do
       render(conn, "show.json", site: site)
@@ -36,7 +36,7 @@ defmodule Flexcility.Web.SiteController do
   end
 
   def delete(conn, %{"id" => id}) do
-    site = Admin.get_site!(id)
+    site = Admin.get_site(id)
     with {:ok, %Site{}} <- Admin.delete_site(site) do
       send_resp(conn, :no_content, "")
     end
