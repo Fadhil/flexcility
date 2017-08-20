@@ -9,4 +9,10 @@ defmodule Flexcility.Utils do
     resource_name = get_resource_name(resource) |> String.downcase
     map["#{resource_name}"].properties
   end
+
+  def get_struct(map, resource) do
+    map
+    |> get_properties(resource)
+    |> resource.from_props
+  end
 end
