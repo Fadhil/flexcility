@@ -11,10 +11,10 @@ defmodule Flexcility.Web.SiteView do
   end
 
   def render("site.json", %{site: site}) do
-    %{id: site["id"],
-      name: site["name"],
-      address: site["address"],
-      description: site["description"],
-      image: site["image"]}
+    %{id: site.id,
+      name: site.name,
+      address: site.address,
+      description: site.description,
+      image: site.image}
   end
 end
