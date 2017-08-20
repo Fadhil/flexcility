@@ -36,7 +36,8 @@ defmodule Flexcility.Mixfile do
      {:phoenix_ecto, "~> 3.0"},
      # {:ecto, "~> 2.1"},
      {:bolt_sips, "~> 0.2"},
-     {:timex, "~> 3.1"}
+     {:timex, "~> 3.1"},
+     {:tzdata, "~> 0.5.11"}
     ]
   end
 
