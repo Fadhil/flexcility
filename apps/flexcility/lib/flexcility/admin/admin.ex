@@ -20,7 +20,7 @@ defmodule Flexcility.Admin do
   """
   def list_sites do
     {:ok, sites} = Graph.get_nodes_by_label(Site)
-    {:ok, sites |> Enum.map(&Utils.get_properties(&1, Site))}
+    {:ok, sites |> Enum.map(&Utils.get_struct(&1, Site))}
   end
 
   @doc """
@@ -42,7 +42,7 @@ defmodule Flexcility.Admin do
       {:ok, []} ->
         {:error, "Site does not exist"}
       {:ok, site} ->
-        {:ok, site |> Utils.get_properties(Site)}
+        {:ok, site |> Utils.get_struct(Site)}
     end
   end
 
