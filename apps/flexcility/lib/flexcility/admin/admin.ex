@@ -37,12 +37,21 @@ defmodule Flexcility.Admin do
       ** (Ecto.NoResultsError)
 
   """
-  def get_site!(id) do
+  def get_site(id) do
     case Graph.get_node_by_id(Site, id) do
       {:ok, []} ->
         {:error, "Site does not exist"}
       {:ok, site} ->
         {:ok, site |> Utils.get_properties(Site)}
+    end
+  end
+
+  def get_site!(id) do
+    case get_site(id) do
+      {:ok, site} ->
+        site
+      {:error, message} ->
+        {:error, message}
     end
   end
 
