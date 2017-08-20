@@ -12,7 +12,5 @@ defmodule Flexcility.Admin.Site do
     field :description, :string
     field :image, :string
     field :name, :string
-
-    timestamps()
   end
 end
