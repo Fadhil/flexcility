@@ -55,7 +55,7 @@ defmodule Flexcility.Graph do
       {:ok, items} ->
         items |> Enum.map(&Utils.get_struct(&1, resource))
       {:ok, []} ->
-        {:error, :no_matching_results}
+        []
     end
   end
 
