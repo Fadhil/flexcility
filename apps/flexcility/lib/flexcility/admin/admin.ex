@@ -7,6 +7,7 @@ defmodule Flexcility.Admin do
 
   alias Flexcility.Admin.Site
   alias Flexcility.Graph
+  alias Graph, as: Repo
   alias Flexcility.Utils
 
   @doc """
@@ -19,8 +20,7 @@ defmodule Flexcility.Admin do
 
   """
   def list_sites do
-    {:ok, sites} = Graph.get_nodes_by_label(Site)
-    {:ok, sites |> Enum.map(&Utils.get_struct(&1, Site))}
+    Repo.all(Site)
   end
 
   @doc """
