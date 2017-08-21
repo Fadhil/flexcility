@@ -7,9 +7,8 @@ defmodule Flexcility.Web.SiteController do
   action_fallback Flexcility.Web.FallbackController
 
   def index(conn, _params) do
-    with {:ok, sites} <- Admin.list_sites() do
-      render(conn, "index.json", sites: sites)
-    end
+    sites =  Admin.list_sites()
+    render(conn, "index.json", sites: sites)
   end
 
   def create(conn, %{"site" => site_params}) do
