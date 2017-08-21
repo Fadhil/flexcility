@@ -18,6 +18,24 @@ defmodule Flexcility.Graph do
     Bolt.query(Bolt.conn, query)
   end
 
+  def get(resource, id) do
+    case get_node_by_id(resource, id) do
+      {:ok, []} ->
+        {:error, "#{resource} does not exist"}
+      {:ok, item} ->
+        {:ok, item|> Utils.get_struct(resource)}
+    end
+  end
+
+  def get!(resource, id) do
+    case get(resource, id) do
+      {:ok, item} ->
+        item
+      {:error, message} ->
+        {:error, message}
+    end
+  end
+
   def get_node_by_id(node_type, id) do
     node_type_string = Utils.get_resource_name(node_type)
     query = """
