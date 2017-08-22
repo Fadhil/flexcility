@@ -67,7 +67,6 @@ defmodule Flexcility.Admin do
       false ->
         {:error, cs}
     end
-    # |> Repo.insert()
   end
 
   @doc """
