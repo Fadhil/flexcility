@@ -8,7 +8,6 @@ defmodule Flexcility.Admin do
   alias Flexcility.Admin.Site
   alias Flexcility.Graph
   alias Graph, as: Repo
-  alias Flexcility.Utils
 
   @doc """
   Returns the list of sites.
