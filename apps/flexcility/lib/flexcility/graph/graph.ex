@@ -3,7 +3,6 @@ defmodule Flexcility.Graph do
 
   alias Flexcility.Utils
   import Flexcility.Graph.Property
-  require IEx
 
   def create_node(node_type, changeset) do
     attributes_string = create_changeset_to_string(changeset)
