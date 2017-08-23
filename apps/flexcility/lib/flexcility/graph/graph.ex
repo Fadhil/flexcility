@@ -51,12 +51,12 @@ defmodule Flexcility.Graph do
     end
   end
 
-  def all(resource) do
-    case get_nodes_by_label(resource) do
+  def all(resource_type) do
+    case get_nodes_by_label(resource_type) do
       {:ok, []} ->
         []
       {:ok, items} ->
-        items |> Enum.map(&Utils.get_struct(&1, resource))
+        items |> Enum.map(&Utils.get_struct(&1, resource_type))
     end
   end
 
@@ -87,6 +87,22 @@ defmodule Flexcility.Graph do
     case Bolt.query(Bolt.conn, query) do
       {:ok, [item|_]} ->
         {:ok, item |> Utils.get_struct(node_type)}
+    end
+  end
+
+  def delete(struct) do
+    node_type_string = struct.__struct__ |> Utils.get_resource_name()
+    query = """
+      MATCH (n:#{node_type_string} {id: #{struct.id}}) DETACH DELETE n
+    """
+
+    case Bolt.query(Bolt.conn, query) do
+      {:ok, %{stats: nil}} ->
+        {:error, "No nodes deleted"}
+      {:ok, %{stats: %{"nodes-deleted" => 1}}} ->
+        {:ok, "Deleted 1 node of type #{node_type_string}"}
+      {:ok, %{stats: %{"nodes-deleted" => count}}} ->
+        {:ok, "Deleted #{count} node of type #{node_type_string}"}
     end
   end
 

@@ -3,11 +3,24 @@ defmodule Flexcility.Web.SiteView do
   alias Flexcility.Web.SiteView
 
   def render("index.json", %{sites: sites}) do
-    %{data: render_many(sites, SiteView, "site.json")}
+    %{
+      success: true,
+      data: render_many(sites, SiteView, "site.json")
+    }
   end
 
   def render("show.json", %{site: site}) do
-    %{data: render_one(site, SiteView, "site.json")}
+    %{
+      success: true,
+      data: render_one(site, SiteView, "site.json")
+    }
+  end
+
+  def render("delete.json", %{message: message}) do
+    %{
+      success: true,
+      response: message
+    }
   end
 
   def render("site.json", %{site: site}) do

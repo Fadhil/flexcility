@@ -35,9 +35,10 @@ defmodule Flexcility.Web.SiteController do
   end
 
   def delete(conn, %{"id" => id}) do
-    site = Admin.get_site(id)
-    with {:ok, %Site{}} <- Admin.delete_site(site) do
-      send_resp(conn, :no_content, "")
+    with {:ok, site} <- Admin.get_site(id) do
+      with {:ok, message} <- Admin.delete_site(site) do
+       render(conn, "delete.json", message: message)
+      end
     end
   end
 end

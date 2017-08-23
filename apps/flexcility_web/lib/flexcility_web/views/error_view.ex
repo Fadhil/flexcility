@@ -2,15 +2,24 @@ defmodule Flexcility.Web.ErrorView do
   use Flexcility.Web, :view
 
   def render("404.json", _assigns) do
-    %{errors: %{detail: "Page not found"}}
+    %{
+      success: false,
+      errors: %{detail: "Page not found"}
+    }
   end
 
   def render("500.json", _assigns) do
-    %{errors: %{detail: "Internal server error"}}
+    %{
+      success: false,
+      errors: %{detail: "Internal server error"}
+    }
   end
 
   def render("error.json", assigns) do
-    %{errors: %{detail: assigns.error}}
+    %{
+      success: false,
+      errors: %{detail: assigns.error}
+    }
   end
 
   # In case no render clause matches or no
