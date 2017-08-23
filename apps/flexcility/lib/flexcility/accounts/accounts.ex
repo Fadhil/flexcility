@@ -11,6 +11,8 @@ defmodule Flexcility.Accounts do
   alias Flexcility.Accounts.User
   alias Flexcility.Accounts.Registration
   alias Flexcility.Graph
+  alias Flexcility.Utils
+  alias Bolt.Sips, as: Bolt
   @doc """
   Returns the list of users.
 
@@ -21,16 +23,8 @@ defmodule Flexcility.Accounts do
       #
   """
   def list_users do
-
-    Graph.query!(Graph.conn, "MATCH (n:User) return n")
-    |> Enum.map(fn( %{"n"=>user} ) -> user end)
-
+    Graph.all(User)
   end
-
-  # defp map_to_struct(struct_, properties) do
-  #   properties
-  #   |> Enum.reduce(struct_, fn ({key, val}, acc) -> Map.put(acc, String.to_atom(key), val) end)
-  # end
 
   @doc """
   Gets a single user.
@@ -72,7 +66,21 @@ defmodule Flexcility.Accounts do
     MATCH (n:User {email: '#{email}'}) RETURN n as user
     """
 
-    Graph.query(Graph.conn, query)
+    case Bolt.query(Bolt.conn, query) do
+      {:ok, []} ->
+        {:error, :user_not_found}
+      {:ok, [user|_]} ->
+        {:ok, user |> Utils.get_struct(User)}
+    end
+  end
+
+  def get_user_by_email!(%{email: email}) do
+    case get_user_by_email(%{email: email}) do
+      {:ok, user} ->
+        user
+      {:error, :user_not_found} ->
+        nil
+    end
   end
 
   @doc """
@@ -162,25 +170,19 @@ defmodule Flexcility.Accounts do
   end
 
   def create_session(%{"email" => email, "password" => password}) do
-    query = """
-      MATCH (n:User {email: '#{email}', password: '#{password}' })
-      OPTIONAL MATCH (n)-[:HAS_ROLE]->(r) return n, r
-     """
-    result =
-      Graph.query!(
-        Graph.conn, query
-      )
+    user = get_user_by_email!(%{email: email})
+    cond do
+      user && checkpw(password, user.password_hash) ->
+        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.id)
+        session_data = %{user: user, role: %{}, token: token}
+        {:ok, session_data}
+      user ->
+        {:error, "Invalid Username/Password"}
+      true ->
+        dummy_checkpw()
+        {:error, "Invalid Username/Password"}
 
-    case result do
-      [] -> {:error, "Invalid Username/Password"}
-      [%{"n"=>user, "r"=>nil}] ->
-        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.properties["uuid"])
-        session_data = %{user: user.properties, role: %{}, token: token}
-        {:ok, session_data}
-      [%{"n"=>user, "r"=>role}] ->
-        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.properties["uuid"])
-        session_data = %{user: user.properties, role: role.properties, token: token}
-        {:ok, session_data}
+
     end
   end
 end
