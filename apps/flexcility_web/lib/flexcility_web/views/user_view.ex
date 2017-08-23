@@ -11,9 +11,9 @@ defmodule Flexcility.Web.UserView do
   end
 
   def render("user.json", %{user: user}) do
-    %{id: user.properties["uuid"],
-      name: user.properties["name"],
-      email: user.properties["email"]#,
+    %{id: user.id,
+      name: user.name,
+      email: user.email#,
       #password: user.password,
       #password_confirmation: user.password_confirmation}
   }
