@@ -11,9 +11,9 @@ defmodule Flexcility.Web.SessionView do
   end
 
   def render("session.json", %{session: session}) do
-    %{id: session.user["uuid"],
-      email: session.user["email"],
-      role: session.role["name"],
+    %{id: session.user.id,
+      email: session.user.email,
+      role: session.role[:name],
       token: session.token}
   end
 end
