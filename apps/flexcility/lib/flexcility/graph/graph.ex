@@ -4,19 +4,24 @@ defmodule Flexcility.Graph do
   alias Flexcility.Utils
   import Flexcility.Graph.Property
 
-  def create_node(node_type, changeset) do
+  def create_node(resource, changeset) do
     attributes_string = create_changeset_to_string(changeset)
-    node_type_string = Utils.get_resource_name(node_type)
+    resource_string = resource.__schema__(:source)
     query = """
-      MERGE (id:UniqueId {name: '#{node_type_string}'})
+      MERGE (id:UniqueId {name: '#{resource_string}'})
       ON CREATE SET id.count = 1
       ON MATCH SET id.count = id.count + 1
       WITH id.count AS uid
-      CREATE (n:#{node_type_string} {id: uid, #{attributes_string}})
-      RETURN n as new_#{node_type_string |> String.downcase}
+      CREATE (n:#{resource_string} {id: uid, #{attributes_string}})
+      RETURN n as #{resource_string |> String.downcase}
     """
 
-    Bolt.query(Bolt.conn, query)
+    case Bolt.query(Bolt.conn, query) do
+      {:ok, [item]} ->
+        {:ok, item |> Utils.get_struct(resource)}
+      {:error, message} ->
+        {:error, message}
+    end
   end
 
   def get(resource, id) do

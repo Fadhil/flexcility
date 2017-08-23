@@ -12,12 +12,19 @@ defmodule Flexcility.Web.FallbackController do
     |> render(Flexcility.Web.ChangesetView, "error.json", changeset: changeset)
   end
 
+
   def call(conn, {:error,
    [code: "Neo.ClientError.Schema.ConstraintValidationFailed",
-    message: _message ]}) do
+    message: message ]}) do
+    message = case String.match?(message, ~r/Node\s\d+\salready\sexists.*email.*/) do
+      true ->
+        "Email has been taken"
+      false ->
+        message
+    end
     conn
     |> put_status(:unprocessable_entity)
-    |> render(Flexcility.Web.ErrorView, "error.json", error: "Email has been taken")
+    |> render(Flexcility.Web.ErrorView, "error.json", error: message)
   end
 
   def call(conn, {:error, :not_found}) do

@@ -6,9 +6,13 @@ defmodule Flexcility.Accounts do
   """
 
   import Ecto.{Query, Changeset}, warn: false
+  import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
 
-  alias Bolt.Sips, as: Graph
-
+  alias Flexcility.Accounts.User
+  alias Flexcility.Accounts.Registration
+  alias Flexcility.Graph
+  alias Flexcility.Utils
+  alias Bolt.Sips, as: Bolt
   @doc """
   Returns the list of users.
 
@@ -19,16 +23,8 @@ defmodule Flexcility.Accounts do
       #
   """
   def list_users do
-
-    Graph.query!(Graph.conn, "MATCH (n:User) return n")
-    |> Enum.map(fn( %{"n"=>user} ) -> user end)
-
+    Graph.all(User)
   end
-
-  # defp map_to_struct(struct_, properties) do
-  #   properties
-  #   |> Enum.reduce(struct_, fn ({key, val}, acc) -> Map.put(acc, String.to_atom(key), val) end)
-  # end
 
   @doc """
   Gets a single user.
@@ -42,13 +38,18 @@ defmodule Flexcility.Accounts do
       # {:error, :user_not_found}
 
   """
+  def get_user(id) do
+    Graph.get(User, id)
+  end
+
   def get_user!(id) do
-    case Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n") do
-      [] ->
-        {:error, :user_not_found}
-      [%{"n" => user }]->
-        {:ok, user}
-    end
+    Graph.get!(User, id)
+    # case Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n") do
+    #   [] ->
+    #     {:error, :user_not_found}
+    #   [%{"n" => user }]->
+    #     {:ok, user}
+    # end
   end
 
   @doc """
@@ -65,51 +66,22 @@ defmodule Flexcility.Accounts do
     MATCH (n:User {email: '#{email}'}) RETURN n as user
     """
 
-    Graph.query(Graph.conn, query)
+    case Bolt.query(Bolt.conn, query) do
+      {:ok, []} ->
+        {:error, :user_not_found}
+      {:ok, [user|_]} ->
+        {:ok, user |> Utils.get_struct(User)}
+    end
   end
 
-  # @doc """
-  # Register a new user account
-  #
-  # ## Examples
-  #
-  #     iex> Flexcility.Accounts.register(%{name: "Fadhil Luqman", email: "fadhil.luqman@gmail.com", password: "password" })
-  #     {:ok, %{}}
-  #
-  #     iex> Flexcility.Accounts.register(%{name: "Fadhil Luqman", email: "fadhil.luqman@gmail.com"})
-  #     {:error, %{message: "Password is required", code: "registration_password_required"}}
-  #
-  #     iex> Flexcility.Accounts.register(%{email: "fadhil.luqman@gmail.com", password: "password"})
-  #     {:error, %{message: "Name is required", code: "registration_name_required"}}
-  # """
-  # def register(attrs \\ %{})
-  # def register(
-  #   %{email: email, name: name, password: password} = attrs
-  # ) do
-  #   {:ok, %{}}
-  # end
-  #
-  # def register(
-  #   %{email: email, name: name} = attrs
-  # ) do
-  #   {:error, %{message: "Password is required", code: "registration_password_required"}}
-  # end
-  #
-  # def register(
-  #   %{email: email, password: password} = attrs
-  # ) do
-  #   {:error, %{message: "Name is required", code: "registration_name_required"}}
-  # end
-  #
-  # def register(
-  #   %{name: name, password: password} = attrs
-  # ) do
-  #   {:error, %{message: "Email is required", code: "registration_email_required"}}
-  # end
-  #
-  # def register(attrs) do
-  #   {:error, %{message: "Something went wrong", code: "something_went_wrong"}}
-  # end
+  def get_user_by_email!(%{email: email}) do
+    case get_user_by_email(%{email: email}) do
+      {:ok, user} ->
+        user
+      {:error, :user_not_found} ->
+        nil
+    end
+  end
 
   @doc """
   Creates a user.
@@ -123,13 +95,25 @@ defmodule Flexcility.Accounts do
   #     {:error, %Ecto.Changeset{}}
 
   """
-  def create_user(%{"email"=>email, "name"=>name, "password"=>password} \\ %{}) do
-		query = """
-			CREATE (n:User {email: '#{email}', name: '#{name}', password: '#{password}'})
-			RETURN n as new_user
-		"""
+  def create_user(attrs \\ %{}) do
+    cs = %Registration{}
+    |> user_changeset(attrs)
 
-		Graph.query(Graph.conn, query)
+    case cs.valid? do
+      true ->
+        cs = cs
+              |> put_change(:password_hash, Comeonin.Bcrypt.hashpwsalt(cs.changes.password))
+              |> delete_change(:password)
+        Graph.create_node(User, cs)
+      false ->
+        {:error, cs}
+    end
+		# query = """
+		# 	CREATE (n:User {email: '#{email}', name: '#{name}', password: '#{password}'})
+		# 	RETURN n as new_user
+		# """
+
+		# Graph.query(Graph.conn, query)
   end
 
   @doc """
@@ -163,7 +147,7 @@ defmodule Flexcility.Accounts do
 
   """
   def delete_user(user) do
-    # Repo.delete(user)
+    Graph.delete(user)
   end
 
   @doc """
@@ -181,30 +165,24 @@ defmodule Flexcility.Accounts do
 
   def user_changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :password, :password_confirmation])
-    |> validate_required([:name, :email, :password, :password_confirmation])
+    |> cast(attrs, [:name, :email, :password])
+    |> validate_required([:name, :email, :password])
   end
 
   def create_session(%{"email" => email, "password" => password}) do
-    query = """
-      MATCH (n:User {email: '#{email}', password: '#{password}' })
-      OPTIONAL MATCH (n)-[:HAS_ROLE]->(r) return n, r
-     """
-    result =
-      Graph.query!(
-        Graph.conn, query
-      )
+    user = get_user_by_email!(%{email: email})
+    cond do
+      user && checkpw(password, user.password_hash) ->
+        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.id)
+        session_data = %{user: user, role: %{}, token: token}
+        {:ok, session_data}
+      user ->
+        {:error, "Invalid Username/Password"}
+      true ->
+        dummy_checkpw()
+        {:error, "Invalid Username/Password"}
 
-    case result do
-      [] -> {:error, "Invalid Username/Password"}
-      [%{"n"=>user, "r"=>nil}] ->
-        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.properties["uuid"])
-        session_data = %{user: user.properties, role: %{}, token: token}
-        {:ok, session_data}
-      [%{"n"=>user, "r"=>role}] ->
-        token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.properties["uuid"])
-        session_data = %{user: user.properties, role: role.properties, token: token}
-        {:ok, session_data}
+
     end
   end
 end

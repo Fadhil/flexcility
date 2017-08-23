@@ -34,10 +34,12 @@ defmodule Flexcility.Mixfile do
   defp deps do
     [{:postgrex, ">= 0.0.0"},
      {:phoenix_ecto, "~> 3.0"},
-     # {:ecto, "~> 2.1"},
+     # {:ecto, "~> 2.2.0-rc.1"},
      {:bolt_sips, "~> 0.2"},
      {:timex, "~> 3.1"},
-     {:tzdata, "~> 0.5.11"}
+     {:tzdata, "~> 0.5.11"},
+     {:comeonin, "~> 4.0"},
+     {:bcrypt_elixir, "~> 0.12.0"}
     ]
   end
 
