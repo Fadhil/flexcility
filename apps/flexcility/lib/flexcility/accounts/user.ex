@@ -7,6 +7,5 @@ defmodule Flexcility.Accounts.User do
     field :email, :string
     field :image, :string
     field :password_hash, :string
-    field :password, :string, virtual: true
   end
 end
