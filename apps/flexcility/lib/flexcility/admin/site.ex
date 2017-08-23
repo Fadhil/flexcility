@@ -2,7 +2,7 @@ defmodule Flexcility.Admin.Site do
 
   use Ecto.Schema
 
-  schema "sites" do
+  schema "Site" do
     field :address, :string
     field :description, :string
     field :image, :string

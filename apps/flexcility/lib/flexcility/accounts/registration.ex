@@ -2,7 +2,7 @@ defmodule Flexcility.Accounts.Registration do
 
   use Ecto.Schema
 
-  embedded_schema do
+  schema "User" do
     field :name, :string
     field :email, :string
     field :password, :string

@@ -2,7 +2,7 @@ defmodule Flexcility.Accounts.User do
 
   use Ecto.Schema
 
-  schema "users" do
+  schema "User" do
     field :name, :string
     field :email, :string
     field :image, :string
