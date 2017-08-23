@@ -15,6 +15,12 @@ defmodule Flexcility.Web.SiteView do
       data: render_one(site, SiteView, "site.json")
     }
   end
+
+  def render("delete.json", %{message: message}) do
+    %{
+      success: true,
+      response: message
+    }
   end
 
   def render("site.json", %{site: site}) do
