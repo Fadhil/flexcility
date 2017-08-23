@@ -8,6 +8,7 @@ defmodule Flexcility.Accounts do
   import Ecto.{Query, Changeset}, warn: false
 
   alias Flexcility.Accounts.User
+  alias Flexcility.Accounts.Registration
   alias Flexcility.Graph
   @doc """
   Returns the list of users.
@@ -73,49 +74,6 @@ defmodule Flexcility.Accounts do
     Graph.query(Graph.conn, query)
   end
 
-  # @doc """
-  # Register a new user account
-  #
-  # ## Examples
-  #
-  #     iex> Flexcility.Accounts.register(%{name: "Fadhil Luqman", email: "fadhil.luqman@gmail.com", password: "password" })
-  #     {:ok, %{}}
-  #
-  #     iex> Flexcility.Accounts.register(%{name: "Fadhil Luqman", email: "fadhil.luqman@gmail.com"})
-  #     {:error, %{message: "Password is required", code: "registration_password_required"}}
-  #
-  #     iex> Flexcility.Accounts.register(%{email: "fadhil.luqman@gmail.com", password: "password"})
-  #     {:error, %{message: "Name is required", code: "registration_name_required"}}
-  # """
-  # def register(attrs \\ %{})
-  # def register(
-  #   %{email: email, name: name, password: password} = attrs
-  # ) do
-  #   {:ok, %{}}
-  # end
-  #
-  # def register(
-  #   %{email: email, name: name} = attrs
-  # ) do
-  #   {:error, %{message: "Password is required", code: "registration_password_required"}}
-  # end
-  #
-  # def register(
-  #   %{email: email, password: password} = attrs
-  # ) do
-  #   {:error, %{message: "Name is required", code: "registration_name_required"}}
-  # end
-  #
-  # def register(
-  #   %{name: name, password: password} = attrs
-  # ) do
-  #   {:error, %{message: "Email is required", code: "registration_email_required"}}
-  # end
-  #
-  # def register(attrs) do
-  #   {:error, %{message: "Something went wrong", code: "something_went_wrong"}}
-  # end
-
   @doc """
   Creates a user.
 
@@ -129,7 +87,7 @@ defmodule Flexcility.Accounts do
 
   """
   def create_user(attrs \\ %{}) do
-    cs = %User{}
+    cs = %Registration{}
     |> user_changeset(attrs)
 
     case cs.valid? do
