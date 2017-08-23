@@ -6,7 +6,7 @@ defmodule Flexcility.Graph do
 
   def create_node(node_type, changeset) do
     attributes_string = create_changeset_to_string(changeset)
-    node_type_string = Utils.get_resource_name(node_type)
+    node_type_string = node_type.__schema__(:source)
     query = """
       MERGE (id:UniqueId {name: '#{node_type_string}'})
       ON CREATE SET id.count = 1
