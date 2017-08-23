@@ -57,9 +57,9 @@ defmodule Flexcility.Web.Plugs.Authenticate do
   end
 
   def get_user(user_id) do
-    case Accounts.get_user!(user_id) do
-      {:ok, user_node} ->
-        {:authenticated, user_node.properties}
+    case Accounts.get_user(user_id) do
+      {:ok, user} ->
+        {:authenticated, user}
       {:error, _} ->
         :invalid_token
     end
