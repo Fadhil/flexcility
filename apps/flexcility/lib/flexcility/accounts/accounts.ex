@@ -7,8 +7,8 @@ defmodule Flexcility.Accounts do
 
   import Ecto.{Query, Changeset}, warn: false
 
-  alias Bolt.Sips, as: Graph
-
+  alias Flexcility.Accounts.User
+  alias Flexcility.Graph
   @doc """
   Returns the list of users.
 
@@ -42,13 +42,18 @@ defmodule Flexcility.Accounts do
       # {:error, :user_not_found}
 
   """
+  def get_user(id) do
+    Graph.get(User, id)
+  end
+
   def get_user!(id) do
-    case Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n") do
-      [] ->
-        {:error, :user_not_found}
-      [%{"n" => user }]->
-        {:ok, user}
-    end
+    Graph.get!(User, id)
+    # case Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n") do
+    #   [] ->
+    #     {:error, :user_not_found}
+    #   [%{"n" => user }]->
+    #     {:ok, user}
+    # end
   end
 
   @doc """
@@ -123,13 +128,25 @@ defmodule Flexcility.Accounts do
   #     {:error, %Ecto.Changeset{}}
 
   """
-  def create_user(%{"email"=>email, "name"=>name, "password"=>password} \\ %{}) do
-		query = """
-			CREATE (n:User {email: '#{email}', name: '#{name}', password: '#{password}'})
-			RETURN n as new_user
-		"""
+  def create_user(attrs \\ %{}) do
+    cs = %User{}
+    |> user_changeset(attrs)
 
-		Graph.query(Graph.conn, query)
+    case cs.valid? do
+      true ->
+        cs = cs
+              |> put_change(:password_hash, Comeonin.Bcrypt.hashpwsalt(cs.changes.password))
+              |> delete_change(:password)
+        Graph.create_node(User, cs)
+      false ->
+        {:error, cs}
+    end
+		# query = """
+		# 	CREATE (n:User {email: '#{email}', name: '#{name}', password: '#{password}'})
+		# 	RETURN n as new_user
+		# """
+
+		# Graph.query(Graph.conn, query)
   end
 
   @doc """
@@ -163,7 +180,7 @@ defmodule Flexcility.Accounts do
 
   """
   def delete_user(user) do
-    # Repo.delete(user)
+    Graph.delete(user)
   end
 
   @doc """
@@ -181,8 +198,8 @@ defmodule Flexcility.Accounts do
 
   def user_changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email, :password, :password_confirmation])
-    |> validate_required([:name, :email, :password, :password_confirmation])
+    |> cast(attrs, [:name, :email, :password])
+    |> validate_required([:name, :email, :password])
   end
 
   def create_session(%{"email" => email, "password" => password}) do
