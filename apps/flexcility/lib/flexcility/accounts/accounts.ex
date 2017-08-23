@@ -6,6 +6,7 @@ defmodule Flexcility.Accounts do
   """
 
   import Ecto.{Query, Changeset}, warn: false
+  import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
 
   alias Flexcility.Accounts.User
   alias Flexcility.Accounts.Registration
