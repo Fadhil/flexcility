@@ -181,8 +181,6 @@ defmodule Flexcility.Accounts do
       true ->
         dummy_checkpw()
         {:error, "Invalid Username/Password"}
-
-
     end
   end
 end
