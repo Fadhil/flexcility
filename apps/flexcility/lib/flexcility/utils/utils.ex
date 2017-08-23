@@ -1,4 +1,6 @@
 defmodule Flexcility.Utils do
+  alias Ecto.Changeset
+
   def get_resource_name(resource) do
     to_string(resource)
     |> String.split(".")
@@ -11,8 +13,11 @@ defmodule Flexcility.Utils do
   end
 
   def get_struct(map, resource) do
-    map
-    |> get_properties(resource)
-    |> resource.from_props
+    props = map
+            |> get_properties(resource)
+
+    resource.__struct__
+    |> Changeset.cast(props, resource.__schema__(:fields))
+    |> Changeset.apply_changes()
   end
 end

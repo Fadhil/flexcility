@@ -1,16 +1,8 @@
 defmodule Flexcility.Admin.Site do
 
-  # These module attributes come first because they're needed by
-  # Flexcility.Utils.PropsToStruct to convert the node properties
-  # to an Ecto struct.
-  @all_fields [:name, :address, :description, :image]
-  @required_fields [:name, :address, :description]
-
   use Ecto.Schema
-  use Flexcility.Utils.PropsToStruct
 
-
-  embedded_schema do
+  schema "sites" do
     field :address, :string
     field :description, :string
     field :image, :string
