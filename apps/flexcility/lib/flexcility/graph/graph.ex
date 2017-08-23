@@ -51,12 +51,12 @@ defmodule Flexcility.Graph do
     end
   end
 
-  def all(resource) do
-    case get_nodes_by_label(resource) do
+  def all(resource_type) do
+    case get_nodes_by_label(resource_type) do
       {:ok, []} ->
         []
       {:ok, items} ->
-        items |> Enum.map(&Utils.get_struct(&1, resource))
+        items |> Enum.map(&Utils.get_struct(&1, resource_type))
     end
   end
 
