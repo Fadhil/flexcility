@@ -13,7 +13,7 @@ defmodule Flexcility.Utils.PropsToStruct do
 
       defp apply_id_from_props(cs, props) do
         cs
-        |> Changeset.force_change(:id, props["id"])
+        |> Changeset.change(%{id: props["id"]})
       end
     end
   end
