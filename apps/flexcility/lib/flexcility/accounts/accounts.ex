@@ -183,8 +183,16 @@ defmodule Flexcility.Accounts do
 
   def user_changeset(user, attrs) do
     user
+    |> cast(attrs, [:name, :email])
+    |> validate_required([:name, :email])
+  end
+
+  def user_update_changeset(user, attrs) do
+    user
     |> cast(attrs, [:name, :email, :password])
-    |> validate_required([:name, :email, :password])
+    |> validate_required([:name, :email])
+  end
+
   def organisation_changeset(organisation, attrs) do
     organisation
     |> cast(attrs, [:name, :location, :description])
