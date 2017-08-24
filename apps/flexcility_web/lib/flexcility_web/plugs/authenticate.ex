@@ -18,10 +18,12 @@ defmodule Flexcility.Web.Plugs.Authenticate do
     case result do
       :missing_token ->
         conn |> put_status(401)
-        |> json(%{errors: %{detail: :missing_valid_api_token }})
-        |> halt#%{errors: %{detail: "Missing valid API token"}}) |> halt
+        |> json(%{success: false, errors: %{detail: :missing_valid_api_token }})
+        |> halt
       :invalid_token ->
-        conn |> send_resp(401, %{error: %{detail: :invalid_api_token }}) |> halt
+        conn |> put_status(401)
+        |> json(%{success: false, errors: %{detail: :invalid_api_token }})
+        |> halt
       { :authenticated, user } ->
         conn |> assign(:current_user, user)
     end
@@ -52,7 +54,7 @@ defmodule Flexcility.Web.Plugs.Authenticate do
       {:ok, user_id} ->
         get_user(user_id)
       {:error, error_message} ->
-        {:error, error_message}
+        :invalid_token
     end
   end
 
