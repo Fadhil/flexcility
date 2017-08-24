@@ -44,12 +44,6 @@ defmodule Flexcility.Accounts do
 
   def get_user!(id) do
     Graph.get!(User, id)
-    # case Graph.query!(Graph.conn, "MATCH (n:User {uuid: '#{id}'}) return n") do
-    #   [] ->
-    #     {:error, :user_not_found}
-    #   [%{"n" => user }]->
-    #     {:ok, user}
-    # end
   end
 
   @doc """
