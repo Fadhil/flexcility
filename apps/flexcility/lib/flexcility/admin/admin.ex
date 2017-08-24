@@ -120,4 +120,16 @@ defmodule Flexcility.Admin do
     |> cast(attrs, [:name, :address, :description, :image])
     |> validate_required([:name, :address, :description])
   end
+
+  def user_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name, :email, :id])
+    |> validate_required([:name, :email])
+  end
+
+  def organisation_changeset(organisation, attrs) do
+    organisation
+    |> cast(attrs, [:name, :location, :description, :id])
+    |> validate_required([:name])
+  end
 end
