@@ -56,6 +56,15 @@ defmodule Flexcility.Graph do
     end
   end
 
+  def run_query(query) do
+    case Bolt.query(Bolt.conn, query) do
+      {:ok, []} ->
+        {:error, :no_matching_nodes_found}
+      {:ok, results} ->
+        {:ok, results}
+    end
+  end
+
   def all(resource_type) do
     case get_nodes_by_label(resource_type) do
       {:ok, []} ->
