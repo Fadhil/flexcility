@@ -9,6 +9,7 @@ defmodule Flexcility.Accounts do
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
 
   alias Flexcility.Accounts.User
+  alias Flexcility.Accounts.Organisation
   alias Flexcility.Accounts.Registration
   alias Flexcility.Graph
   alias Flexcility.Utils
@@ -77,6 +78,25 @@ defmodule Flexcility.Accounts do
     end
   end
 
+  def get_organisation(id) do
+    Graph.get(Organisation, id)
+  end
+
+  def get_organisation!(id) do
+    Graph.get!(Organisation, id)
+  end
+
+  def create_organisation(org_attrs \\ %{}) do
+    cs = %Organisation{}
+    |> organisation_changeset(org_attrs)
+
+    case cs.valid? do
+      true ->
+        Graph.create_node(Organisation, cs)
+      false ->
+        {:error, cs}
+    end
+  end
   @doc """
   Creates a user.
 
@@ -157,10 +177,18 @@ defmodule Flexcility.Accounts do
     user_changeset(user, %{})
   end
 
+  def change_organisation(organisation) do
+    organisation_changeset(organisation, %{})
+  end
+
   def user_changeset(user, attrs) do
     user
     |> cast(attrs, [:name, :email, :password])
     |> validate_required([:name, :email, :password])
+  def organisation_changeset(organisation, attrs) do
+    organisation
+    |> cast(attrs, [:name, :location, :description])
+    |> validate_required([:name])
   end
 
   def create_session(%{"email" => email, "password" => password}) do
