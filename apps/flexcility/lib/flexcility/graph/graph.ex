@@ -12,7 +12,7 @@ defmodule Flexcility.Graph do
       ON CREATE SET id.count = 1
       ON MATCH SET id.count = id.count + 1
       WITH id.count AS uid
-      CREATE (n:#{resource_string} {id: uid, #{attributes_string}})
+      MERGE (n:#{resource_string} {id: uid, #{attributes_string}})
       RETURN n as #{resource_string |> String.downcase}
     """
 
