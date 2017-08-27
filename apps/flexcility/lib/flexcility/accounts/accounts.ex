@@ -97,6 +97,16 @@ defmodule Flexcility.Accounts do
         {:error, cs}
     end
   end
+
+  def get_user_with_role_by_email(%{email: email}) do
+    query = """
+      MATCH (user:User {email: '#{email}'})-[rel:HAS_ROLE]-(role:Role)
+      RETURN user, rel, role
+    """
+
+    Graph.run_query(query)
+  end
+
   def register_user(attrs \\ %{}) do
     cs = %Registration{}
     |> registration_changeset(attrs)
