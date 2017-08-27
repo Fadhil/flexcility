@@ -97,6 +97,21 @@ defmodule Flexcility.Accounts do
         {:error, cs}
     end
   end
+  def register_user(attrs \\ %{}) do
+    cs = %Registration{}
+    |> registration_changeset(attrs)
+
+    case cs.valid? do
+      true ->
+        cs = cs
+              |> put_change(:password_hash, Comeonin.Bcrypt.hashpwsalt(cs.changes.password))
+              |> delete_change(:password)
+        Graph.create_node(User, cs)
+      false ->
+        {:error, cs}
+    end
+  end
+
   @doc """
   Creates a user.
 
@@ -110,7 +125,7 @@ defmodule Flexcility.Accounts do
 
   """
   def create_user(attrs \\ %{}) do
-    cs = %Registration{}
+    cs = %User{}
     |> user_changeset(attrs)
 
     case cs.valid? do
@@ -179,6 +194,12 @@ defmodule Flexcility.Accounts do
 
   def change_organisation(organisation) do
     organisation_changeset(organisation, %{})
+  end
+
+  def registration_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name, :email, :password])
+    |> validate_required([:name, :email, :password])
   end
 
   def user_changeset(user, attrs) do
