@@ -61,6 +61,11 @@ defmodule Flexcility.Graph do
     node2_attributes_string = create_changeset_to_string(node2)
     [node1_string, node2_string] = [node1, node2]
                                    |> Utils.get_schema_source_for_each()
+    node1_string_downcased = node1_string
+                             |> String.downcase
+    node2_string_downcased = node2_string
+                             |> String.downcase
+
     query = """
       MERGE (id:UniqueId {name: '#{node1_string}'})
       ON CREATE SET id.count = 1
@@ -70,14 +75,25 @@ defmodule Flexcility.Graph do
       WITH n1
       MERGE (id2:UniqueId {name: '#{node2_string}'})
       ON CREATE SET id2.count = 1
-      WITH n1, id2.count as uid2
+      WITH n1, id2 as uid2
       MERGE (n2:#{node2_string} {#{node2_attributes_string}})
       ON CREATE SET uid2.count = uid2.count + 1, n2.id = uid2.count
       WITH n1, n2
       MERGE (n1)-[r:#{rel}]->(n2)
+      return n1 as #{node1_string |> String.downcase}, n2 as #{node2_string |> String.downcase}, r as rel
     """
 
-    run_query(query)
+    case run_query(query) do
+      {:ok, [items]} = thing ->
+        node_types_list = [
+          {node1_string_downcased, node1.data.__struct__},
+          {node2_string_downcased, node2.data.__struct__}
+        ]
+        node_types_list
+        |> Enum.map(fn({x,y}) -> Utils.get_struct(items, y) end)
+      {:error, error_message} ->
+        {:error, error_message}
+    end
   end
 
 
@@ -88,6 +104,8 @@ defmodule Flexcility.Graph do
         {:error, :no_matching_nodes_found}
       {:ok, results} ->
         {:ok, results}
+      {:error, error_message} ->
+        {:error, error_message}
     end
   end
 

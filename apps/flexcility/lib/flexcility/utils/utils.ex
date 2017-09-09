@@ -22,12 +22,21 @@ defmodule Flexcility.Utils do
   end
 
   defimpl GetSchema, for: Any do
-    def source(resource) do
+    def source(resource) when is_map(resource) do
       case Map.has_key?(resource, :__struct__) do
         true ->
           resource.__struct__.__schema__(:source)
         false ->
           {:error, :not_implemented}
+      end
+    end
+
+    def source(resource) do
+      case resource.__info__(:functions)[:__schema__] do
+        nil ->
+          {:error, :no_source_found}
+        arity ->
+          resource.__schema__(:source)
       end
     end
   end
@@ -41,7 +50,7 @@ defmodule Flexcility.Utils do
   end
 
   def get_properties(map, resource) do
-    resource_name = get_resource_name(resource) |> String.downcase
+    resource_name = GetSchema.source(resource) |> String.downcase
     map["#{resource_name}"].properties
   end
 
@@ -52,5 +61,10 @@ defmodule Flexcility.Utils do
     resource.__struct__
     |> Changeset.cast(props, resource.__schema__(:fields))
     |> Changeset.apply_changes()
+  end
+
+  def get_struct_from_node(n) do
+    props = n.properties
+
   end
 end
