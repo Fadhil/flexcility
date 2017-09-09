@@ -87,8 +87,9 @@ defmodule Flexcility.Accounts do
   end
 
   def create_organisation(org_attrs \\ %{}) do
-    cs = %Organisation{}
-    |> organisation_changeset(org_attrs)
+    cs =
+      %Organisation{}
+      |> organisation_changeset(org_attrs)
 
     case cs.valid? do
       true ->
@@ -105,6 +106,30 @@ defmodule Flexcility.Accounts do
     """
 
     Graph.run_query(query)
+  end
+
+  def register_user_with_org(registration_params, org_params) do
+    reg_cs =
+      %Registration{}
+      |> registration_changeset(registration_params)
+
+    org_cs =
+      %Organisation{}
+      |> organisation_changeset(org_params)
+
+    case reg_cs.valid? and org_cs.valid? do
+      true ->
+        reg_cs = reg_cs
+                  |> put_change(:password_hash,
+                                Comeonin.Bcrypt.hashpwsalt(
+                                  reg_cs.changes.password
+                                )
+                              )
+                  |> delete_change(:password)
+        Graph.create_nodes_with_rel({reg_cs, "OWNS", org_cs})
+      false ->
+        {:error, [reg_cs, org_cs]}
+    end
   end
 
   def register_user(attrs \\ %{}) do
@@ -226,8 +251,8 @@ defmodule Flexcility.Accounts do
 
   def organisation_changeset(organisation, attrs) do
     organisation
-    |> cast(attrs, [:name, :location, :description])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :location, :description, :subdomain])
+    |> validate_required([:name, :subdomain])
   end
 
   def create_session(%{"email" => email, "password" => password}) do
