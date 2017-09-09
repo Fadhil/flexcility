@@ -3,7 +3,9 @@ defmodule Flexcility.Accounts.Organisation do
 
   schema "Organisation" do
     field :name, :string
+    field :subdomain, :string
     field :location, :string
     field :description, :string
+    has_many :sites, Flexcility.Admin.Site
   end
 end

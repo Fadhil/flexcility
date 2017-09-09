@@ -12,7 +12,6 @@ defmodule Flexcility.Web.FallbackController do
     |> render(Flexcility.Web.ChangesetView, "error.json", changeset: changeset)
   end
 
-
   def call(conn, {:error,
    [code: "Neo.ClientError.Schema.ConstraintValidationFailed",
     message: message ]}) do
@@ -27,6 +26,12 @@ defmodule Flexcility.Web.FallbackController do
     |> render(Flexcility.Web.ErrorView, "error.json", error: message)
   end
 
+  def call(conn, {:error, [_head|_tail] = ecto_changesets}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(Flexcility.Web.ChangesetView, "multiple_errors.json", changesets: ecto_changesets)
+  end
+
   def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)
@@ -37,5 +42,4 @@ defmodule Flexcility.Web.FallbackController do
     conn
     |> render(Flexcility.Web.ErrorView, "error.json", error: error_message)
   end
-
 end
