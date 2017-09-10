@@ -1,7 +1,7 @@
 defmodule Flexcility.Web.RegistrationController do
   use Flexcility.Web, :controller
   alias Flexcility.Accounts
-  alias Flexcility.Accounts.User
+  alias Accounts.{Registration, Organisation}
 
   action_fallback Flexcility.Web.FallbackController
 
@@ -9,7 +9,7 @@ defmodule Flexcility.Web.RegistrationController do
     org_params = %{
       "name" => "JKR", "location" => "Wilayah Persekutuan", "address" => "KL", "subdomain" => "jkr"
     }
-    with {:ok, %User{} = registration} <- Accounts.register_user_with_org(
+    with {:ok, [registration = %Registration{}, organisation = %Organisation{}]} <- Accounts.register_user_with_org(
      registration_params, org_params
     ) do
       conn
