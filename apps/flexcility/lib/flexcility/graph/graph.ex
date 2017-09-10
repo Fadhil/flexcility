@@ -84,13 +84,13 @@ defmodule Flexcility.Graph do
     """
 
     case run_query(query) do
-      {:ok, [items]} = thing ->
+      {:ok, [items]} ->
         node_types_list = [
           {node1_string_downcased, node1.data.__struct__},
           {node2_string_downcased, node2.data.__struct__}
         ]
         node_types_list
-        |> Enum.map(fn({x,y}) -> Utils.get_struct(items, y) end)
+        |> Enum.map(fn({_x,y}) -> Utils.get_struct(items, y) end)
       {:error, error_message} ->
         {:error, error_message}
     end
