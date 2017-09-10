@@ -89,8 +89,8 @@ defmodule Flexcility.Graph do
           {node1_string_downcased, node1.data.__struct__},
           {node2_string_downcased, node2.data.__struct__}
         ]
-        node_types_list
-        |> Enum.map(fn({_x,y}) -> Utils.get_struct(items, y) end)
+        {:ok, node_types_list
+        |> Enum.map(fn({_x,y}) -> Utils.get_struct(items, y) end)}
       {:error, error_message} ->
         {:error, error_message}
     end
