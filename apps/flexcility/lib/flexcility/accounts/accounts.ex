@@ -86,6 +86,10 @@ defmodule Flexcility.Accounts do
     Graph.get!(Organisation, id)
   end
 
+  def list_organisations do
+    Graph.all(Organisation)
+  end
+
   def create_organisation(org_attrs \\ %{}) do
     cs =
       %Organisation{}
