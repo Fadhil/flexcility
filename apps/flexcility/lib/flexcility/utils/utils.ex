@@ -55,12 +55,16 @@ defmodule Flexcility.Utils do
   end
 
   def get_struct(map, resource) do
+    get_changeset(map, resource)
+    |> Changeset.apply_changes()
+  end
+
+  def get_changeset(map, resource) do
     props = map
             |> get_properties(resource)
 
     resource.__struct__
     |> Changeset.cast(props, resource.__schema__(:fields))
-    |> Changeset.apply_changes()
   end
 
   def get_struct_from_node(n) do
