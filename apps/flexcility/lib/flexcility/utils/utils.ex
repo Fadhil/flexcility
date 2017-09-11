@@ -49,6 +49,10 @@ defmodule Flexcility.Utils do
     list |> Enum.map(&get_schema_source(&1))
   end
 
+  def get_properties(%Bolt.Sips.Types.Node{} = node, resource) do
+    props = node.properties
+  end
+
   def get_properties(map, resource) do
     resource_name = GetSchema.source(resource) |> String.downcase
     map["#{resource_name}"].properties
