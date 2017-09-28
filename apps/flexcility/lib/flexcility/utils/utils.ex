@@ -75,4 +75,16 @@ defmodule Flexcility.Utils do
     props = n.properties
 
   end
+
+  def get_rel(map) do
+    rel_to_map(map["rel"])
+  end
+
+  def rel_to_map( %Bolt.Sips.Types.Relationship{ properties: properties, type: type, end: end_id, start: start_id }) do
+    properties
+    |> Enum.map(fn({k,v})-> {String.to_atom(k), v} end)
+    |> Enum.into(%{})
+    |> Map.put(:type, type)
+  end
+
 end

@@ -9,6 +9,7 @@ defmodule Flexcility.Accounts do
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
 
   alias Flexcility.Accounts.User
+  alias Flexcility.Accounts.Sessions
   alias Flexcility.Accounts.Organisation
   alias Flexcility.Accounts.Registration
   alias Flexcility.Graph
@@ -110,10 +111,10 @@ defmodule Flexcility.Accounts do
     end
   end
 
-  def get_user_with_role_by_email(%{email: email}) do
+  def get_user_with_role_by_email(%{email: email, org_subdomain: org_subdomain}) do
     query = """
-      MATCH (user:User {email: '#{email}'})-[rel:HAS_ROLE]-(role:Role)
-      RETURN user, rel, role
+      MATCH (user:User {email: '#{email}'})-[rel]-(org:Organisation {subdomain: '#{org_subdomain}'})
+      RETURN user, labels(rel) as role
     """
 
     Graph.run_query(query)
@@ -137,7 +138,23 @@ defmodule Flexcility.Accounts do
                                 )
                               )
                   |> delete_change(:password)
-        Graph.create_nodes_with_rel({reg_cs, "OWNS", org_cs})
+        query =
+          %Query{}
+          |> Query.unique_id(User)
+          |> Query.with("id")
+          |> Query.merge_with_id(reg_cs)
+          |> Query.with("user")
+          |> Query.unique_id(Organisation)
+          |> Query.with(["user","id"])
+          |> Query.merge_with_id(org_cs)
+          |> Query.with(["user", "organisation"])
+          |> Query.raw("MERGE (user)-[rel:OWNS]->(organisation)")
+          |> Query.raw("MERGE (user)-[rel2:MEMBER {role: 'Admin'}]->(organisation)")
+          |> Query.return([User, Organisation])
+
+        Graph.run_query(query)
+        # query = Graph.create_nodes_with_rel({reg_cs, "OWNS", org_cs})
+
       false ->
         {:error, [reg_cs, org_cs]}
     end
@@ -267,11 +284,12 @@ defmodule Flexcility.Accounts do
   end
 
   def create_session(%{"email" => email, "password" => password}) do
-    user = get_user_by_email!(%{email: email})
+    subdomain = "jkr"
+    %{user: user, role: role} = Sessions.get_user_with_role(%{email: email, subdomain: subdomain})
     cond do
       user && checkpw(password, user.password_hash) ->
         token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.id)
-        session_data = %{user: user, role: %{}, token: token}
+        session_data = %{user: user, role: role, token: token}
         {:ok, session_data}
       user ->
         {:error, "Invalid Username/Password"}
