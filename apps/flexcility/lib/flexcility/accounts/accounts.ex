@@ -12,6 +12,7 @@ defmodule Flexcility.Accounts do
   alias Flexcility.Accounts.Organisation
   alias Flexcility.Accounts.Registration
   alias Flexcility.Graph
+  alias Flexcility.Graph.Query
   alias Flexcility.Utils
   alias Bolt.Sips, as: Bolt
   @doc """
@@ -76,6 +77,12 @@ defmodule Flexcility.Accounts do
       {:error, :user_not_found} ->
         nil
     end
+  end
+
+  def get_user_by_email_and_org(%{email: email, subdomain: subdomain}) do
+    query =
+      %Query{}
+      |> Query.match(%User{email: email})
   end
 
   def get_organisation(id) do
