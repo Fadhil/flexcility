@@ -8,5 +8,6 @@ defmodule Flexcility.Accounts.User do
     field :image, :string
     field :password_hash, :string
     has_many :organisations, Flexcility.Accounts.Organisation
+    has_many :roles, Flexcility.Accounts.Role
   end
 end
