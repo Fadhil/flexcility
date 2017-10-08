@@ -16,29 +16,33 @@ defmodule Flexcility.Accounts.Sessions do
           MATCH (user:User {email: '#{email}'})-[rel:MEMBER]->(organisation:Organisation {subdomain: '#{subdomain}'}) RETURN user, rel, organisation
           """)
 
-    {:ok, res} = Graph.run_query(query.string)
-    [user, rel, organisation] =
-      res
-      |> Enum.map(fn(row)->
-           [
-            Utils.get_struct(row, User),
-            Utils.get_rel(row),
-            Utils.get_struct(row, Organisation)
-          ]
-         end)
-      |> List.flatten
+    case Graph.run_query(query.string) do
+      {:ok, res}->
+        [user, rel, organisation] =
+          res
+          |> Enum.map(fn(row)->
+               [
+                Utils.get_struct(row, User),
+                Utils.get_rel(row),
+                Utils.get_struct(row, Organisation)
+              ]
+             end)
+          |> List.flatten
 
-    role = %{
-     name: rel.role
-    }
+        role = %{
+         name: rel.role
+        }
 
-    %{
-      user: user,
-      role: %{
-        name: rel.role
-      },
-      organisation: organisation
-    }
+        %{
+          user: user,
+          role: %{
+            name: rel.role
+          },
+          organisation: organisation
+        }
+      {:error, error}->
+        {:error, error}
+    end
 
   end
 end
