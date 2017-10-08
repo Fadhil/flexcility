@@ -21,6 +21,12 @@ defmodule Flexcility.Web.UserController do
     end
   end
 
+  def show(conn, %{"email" => email}) do
+    with {:ok, user} <- Accounts.get_user_by_email(%{email: email}) do
+      render(conn, "show.json", user: user)
+    end
+  end
+
   def show(conn, %{"id" => id}) do
     with {:ok, user} <- Accounts.get_user(id) do
       render(conn, "show.json", user: user)
