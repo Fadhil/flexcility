@@ -40,6 +40,7 @@ defmodule Flexcility.Web.FallbackController do
 
   def call(conn, {:error, error_message}) do
     conn
+    |> put_status(:unprocessable_entity)
     |> render(Flexcility.Web.ErrorView, "error.json", error: error_message)
   end
 end
