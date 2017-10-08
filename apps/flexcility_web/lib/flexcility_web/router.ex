@@ -21,6 +21,7 @@ defmodule Flexcility.Web.Router do
     pipe_through :restricted_api
 
     resources "/sites", SiteController
-    resources "/users", UserController
+    # resources "/users", UserController
+    get "/users/:email", UserController, :show
   end
 end
