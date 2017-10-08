@@ -285,7 +285,20 @@ defmodule Flexcility.Accounts do
 
   def create_session(%{"email" => email, "password" => password}) do
     subdomain = "jkr"
-    %{user: user, role: role} = Sessions.get_user_with_role(%{email: email, subdomain: subdomain})
+    case Sessions.get_user_with_role(%{email: email, subdomain: subdomain})  do
+      %{user: user, role: role} ->
+        check_user_password({user, password, role})
+      {:error, :no_matching_nodes_found} ->
+        {:error, "Invalid Username/Password"}
+    end
+  end
+
+  def create_session(%{error: :no_matching_nodes_found}) do
+    dummy_checkpw()
+    {:error, "Invalid Username/Password"}
+  end
+
+  def check_user_password({user, password, role}) do
     cond do
       user && checkpw(password, user.password_hash) ->
         token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.id)
