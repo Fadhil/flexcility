@@ -18,7 +18,7 @@ defmodule Flexcility.Web.ChangesetView do
     }
   end
 
-  def render("multiple_errors.json", %{changesets: [head|tail] = changesets}) do
+  def render("multiple_errors.json", %{changesets: [_head|_tail] = changesets}) do
     errors =
       changesets
       |> Enum.map(fn(x) -> translate_errors(x) end)

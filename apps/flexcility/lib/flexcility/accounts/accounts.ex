@@ -9,9 +9,11 @@ defmodule Flexcility.Accounts do
   import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
 
   alias Flexcility.Accounts.User
+  alias Flexcility.Accounts.Sessions
   alias Flexcility.Accounts.Organisation
   alias Flexcility.Accounts.Registration
   alias Flexcility.Graph
+  alias Flexcility.Graph.Query
   alias Flexcility.Utils
   alias Bolt.Sips, as: Bolt
   @doc """
@@ -78,12 +80,22 @@ defmodule Flexcility.Accounts do
     end
   end
 
+  def get_user_by_email_and_org(%{email: email, subdomain: subdomain}) do
+    query =
+      %Query{}
+      |> Query.match(%User{email: email})
+  end
+
   def get_organisation(id) do
     Graph.get(Organisation, id)
   end
 
   def get_organisation!(id) do
     Graph.get!(Organisation, id)
+  end
+
+  def list_organisations do
+    Graph.all(Organisation)
   end
 
   def create_organisation(org_attrs \\ %{}) do
@@ -99,10 +111,10 @@ defmodule Flexcility.Accounts do
     end
   end
 
-  def get_user_with_role_by_email(%{email: email}) do
+  def get_user_with_role_by_email(%{email: email, org_subdomain: org_subdomain}) do
     query = """
-      MATCH (user:User {email: '#{email}'})-[rel:HAS_ROLE]-(role:Role)
-      RETURN user, rel, role
+      MATCH (user:User {email: '#{email}'})-[rel]-(org:Organisation {subdomain: '#{org_subdomain}'})
+      RETURN user, labels(rel) as role
     """
 
     Graph.run_query(query)
@@ -126,7 +138,23 @@ defmodule Flexcility.Accounts do
                                 )
                               )
                   |> delete_change(:password)
-        Graph.create_nodes_with_rel({reg_cs, "OWNS", org_cs})
+        query =
+          %Query{}
+          |> Query.unique_id(User)
+          |> Query.with("id")
+          |> Query.merge_with_id(reg_cs)
+          |> Query.with("user")
+          |> Query.unique_id(Organisation)
+          |> Query.with(["user","id"])
+          |> Query.merge_with_id(org_cs)
+          |> Query.with(["user", "organisation"])
+          |> Query.raw("MERGE (user)-[rel:OWNS]->(organisation)")
+          |> Query.raw("MERGE (user)-[rel2:MEMBER {role: 'Admin'}]->(organisation)")
+          |> Query.return([User, Organisation])
+
+        Graph.run_query(query)
+        # query = Graph.create_nodes_with_rel({reg_cs, "OWNS", org_cs})
+
       false ->
         {:error, [reg_cs, org_cs]}
     end
@@ -256,11 +284,25 @@ defmodule Flexcility.Accounts do
   end
 
   def create_session(%{"email" => email, "password" => password}) do
-    user = get_user_by_email!(%{email: email})
+    subdomain = "jkr"
+    case Sessions.get_user_with_role(%{email: email, subdomain: subdomain})  do
+      %{user: user, role: role} ->
+        check_user_password({user, password, role})
+      {:error, :no_matching_nodes_found} ->
+        {:error, "Invalid Username/Password"}
+    end
+  end
+
+  def create_session(%{error: :no_matching_nodes_found}) do
+    dummy_checkpw()
+    {:error, "Invalid Username/Password"}
+  end
+
+  def check_user_password({user, password, role}) do
     cond do
       user && checkpw(password, user.password_hash) ->
         token = Phoenix.Token.sign(Flexcility.Web.Endpoint, "user", user.id)
-        session_data = %{user: user, role: %{}, token: token}
+        session_data = %{user: user, role: role, token: token}
         {:ok, session_data}
       user ->
         {:error, "Invalid Username/Password"}

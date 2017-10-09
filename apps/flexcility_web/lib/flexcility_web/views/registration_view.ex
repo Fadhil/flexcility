@@ -6,14 +6,14 @@ defmodule Flexcility.Web.RegistrationView do
     %{success: true, data: render_many(users, RegistrationView, "registration.json")}
   end
 
-  def render("show.json", %{registration: registration}) do
-    %{success: true, data: render_one(registration, RegistrationView, "registration.json")}
+  def render("show.json", %{user: user}) do
+    %{success: true, data: render_one(user, RegistrationView, "registration.json")}
   end
 
-  def render("registration.json", %{registration: registration}) do
-    %{id: registration.id,
-      name: registration.name,
-      email: registration.email,
+  def render("registration.json", %{registration: user}) do
+    %{id: user.id,
+      name: user.name,
+      email: user.email,
       }
   end
 end

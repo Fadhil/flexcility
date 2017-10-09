@@ -5,7 +5,7 @@ defmodule Flexcility.Admin do
 
   import Ecto.{Query, Changeset}, warn: false
 
-  alias Flexcility.Admin.Site
+  alias Flexcility.Admin.{Site, Organisation}
   alias Flexcility.Graph
   alias Graph, as: Repo
 
@@ -20,6 +20,18 @@ defmodule Flexcility.Admin do
   """
   def list_sites do
     Repo.all(Site)
+  end
+
+  @doc """
+  Returns a list or organisations
+
+  ## Examples
+
+      iex> list_organisations()
+      [%Organisation{}, ...]
+  """
+  def list_organisations do
+    Graph.all(Organisation)
   end
 
   @doc """

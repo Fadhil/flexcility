@@ -7,6 +7,7 @@ defmodule Flexcility.Accounts.User do
     field :email, :string
     field :image, :string
     field :password_hash, :string
-    belongs_to :organisation, Flexcility.Accounts.Organisation
+    has_many :organisations, Flexcility.Accounts.Organisation
+    has_many :roles, Flexcility.Accounts.Role
   end
 end

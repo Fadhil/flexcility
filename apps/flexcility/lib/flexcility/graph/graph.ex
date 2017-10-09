@@ -3,6 +3,7 @@ defmodule Flexcility.Graph do
 
   alias Flexcility.Utils
   import Flexcility.Graph.Property
+  alias Flexcility.Graph.Query
 
   def create_node(resource, changeset) do
     attributes_string = create_changeset_to_string(changeset)
@@ -84,13 +85,13 @@ defmodule Flexcility.Graph do
     """
 
     case run_query(query) do
-      {:ok, [items]} = thing ->
+      {:ok, [items]} ->
         node_types_list = [
           {node1_string_downcased, node1.data.__struct__},
           {node2_string_downcased, node2.data.__struct__}
         ]
-        node_types_list
-        |> Enum.map(fn({x,y}) -> Utils.get_struct(items, y) end)
+        {:ok, node_types_list
+        |> Enum.map(fn({_x,y}) -> Utils.get_struct(items, y) end)}
       {:error, error_message} ->
         {:error, error_message}
     end
@@ -98,12 +99,27 @@ defmodule Flexcility.Graph do
 
 
 
-  def run_query(query) do
+  def run_query(query) when is_bitstring query do
     case Bolt.query(Bolt.conn, query) do
       {:ok, []} ->
         {:error, :no_matching_nodes_found}
       {:ok, results} ->
         {:ok, results}
+      {:error, error_message} ->
+        {:error, error_message}
+    end
+  end
+
+  def run_query(%Query{}=query) do
+    run_query(query.string)
+    |> convert_to_struct(query.returns)
+  end
+
+  def convert_to_struct(results, return_vars) do
+    case results do
+      {:ok, items} ->
+        {:ok, items
+        |> Enum.map(fn(item)-> return_vars |> Enum.map(fn(x)-> Utils.get_struct(item, x) end) end) |> List.flatten }
       {:error, error_message} ->
         {:error, error_message}
     end

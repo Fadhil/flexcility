@@ -3,6 +3,7 @@
       Returns a value in single quotes if it's a string and returns other
       values as is (supports integers, floats and booleans for now)
     """
+    @fallback_to_any true
     def property_from_value(value)
   end
 
@@ -23,5 +24,5 @@
   end
 
   defimpl Flexcility.Graph.Property, for: Any do
-    def property_from_value(_value), do: "'null'"
+    def property_from_value(_value), do: "null"
   end
