@@ -263,6 +263,7 @@ defmodule Flexcility.Accounts do
     user
     |> cast(attrs, [:name, :email, :password])
     |> validate_required([:name, :email, :password])
+    |> validate_format(:email, ~r/@/)
   end
 
   def user_changeset(user, attrs) do
@@ -275,6 +276,7 @@ defmodule Flexcility.Accounts do
     user
     |> cast(attrs, [:name, :email, :password])
     |> validate_required([:name, :email])
+    |> validate_format(:email, ~r/@/)
   end
 
   def organisation_changeset(organisation, attrs) do
