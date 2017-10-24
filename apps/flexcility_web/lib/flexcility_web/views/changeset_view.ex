@@ -19,10 +19,13 @@ defmodule Flexcility.Web.ChangesetView do
   end
 
   def render("multiple_errors.json", %{changesets: [_head|_tail] = changesets}) do
-    errors =
+    [errors] =
       changesets
       |> Enum.map(fn(x) -> translate_errors(x) end)
+      |> Enum.filter(fn(x)-> x != %{} end)
+      |> List.flatten
 
+      #require IEx; IEx.pry()
     %{success: false,
       errors: errors
    }
