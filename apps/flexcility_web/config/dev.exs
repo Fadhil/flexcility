@@ -14,10 +14,10 @@ config :flexcility_web, Flexcility.Web.Endpoint,
   watchers: []
 
 # ## CORS Config
-config :cors_plug,
-  origin: ["http://flexcility.dev:4200", "localhost:4200"],
-  max_age: 86400,
-  methods: ["GET", "POST", "PUT"]
+# config :cors_plug,
+#   origin: "http://flexcility.example:4200",
+#   max_age: 86400,
+#   methods: ["GET", "POST", "PUT"]
 
 # ## SSL Support
 #

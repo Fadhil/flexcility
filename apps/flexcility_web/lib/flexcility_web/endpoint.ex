@@ -36,7 +36,7 @@ defmodule Flexcility.Web.Endpoint do
     key: "_flexcility_web_key",
     signing_salt: "lbeZgQ8B"
 
-  plug CORSPlug
+  plug CORSPlug, origin: ["http://cmms.flexcility.com", "http://app.flexcility.com", "http://flexcility.example:4200"]
 
   plug Flexcility.Web.Router
 

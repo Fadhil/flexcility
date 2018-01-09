@@ -18,10 +18,10 @@ config :flexcility_web, Flexcility.Web.Endpoint,
   url: [host: "api.flexcility.com", port: {:system, "PORT"}],
   server: true
 
-config :cors_plug,
-  origin: ["http://cmms.flexcility.com", "http://app.flexcility.com"],
-  max_age: 86400,
-  methods: ["GET", "POST", "PUT"]
+# config :cors_plug,
+#   origin: ["http://cmms.flexcility.com", "http://app.flexcility.com"],
+#   max_age: 86400,
+#   methods: ["GET", "POST", "PUT"]
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

@@ -39,7 +39,7 @@ defmodule Flexcility.Web.Mixfile do
      {:flexcility, in_umbrella: true},
      {:cowboy, "~> 1.0"},
      {:distillery, "~> 1.0"},
-     {:cors_plug, "~> 1.2"}]
+     {:cors_plug, "~> 1.5.0"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
